@@ -28,7 +28,7 @@ if __name__ == '__main__':
 
 
 		for reč in rečnik:
-			prefiksator(reč, lista_prefiksa, rečnik, lista_sufiksa, lista_infinitiva, lista_glagola)
+			prefiksator(reč, lista_prefiksa, rečnik, lista_sufiksa, lista_infinitiva, lista_glagola, lj_lista)
 
 	else:
 		"Došlo je do greške, pokrenite program ponovo."

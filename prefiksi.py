@@ -27,7 +27,7 @@ def alomorf(prefiks, reč):
     else:
         return False
 
-def provera_glagola(osnova_bez_sufiksa, lista_infinitiva, uslov, lista_glagola, lista_prefiksa):
+def provera_glagola(osnova_bez_sufiksa, lista_infinitiva, uslov, lista_glagola, lista_prefiksa, gpt_check):
     """
     Proverava da li imenice koje su nastale od glagolskog prideva trpnog zadovoljavaju peti odnosno šesti uslov.
     """
@@ -35,14 +35,26 @@ def provera_glagola(osnova_bez_sufiksa, lista_infinitiva, uslov, lista_glagola, 
         potencijalni_glagol = osnova_bez_sufiksa + nastavak_za_infinitiv
         if potencijalni_glagol in lista_glagola:
             prvi = prvi_uslov(potencijalni_glagol, prefiks, lista_glagola)
-            if prvi == 1:
-                uslov = 5
-            else:
+            if prvi == 0:
                 drugi = drugi_uslov(prefiks, potencijalni_glagol, lista_prefiksa, lista_glagola)
-                if drugi == 2:
+
+            """
+            Za objašnjenje gpt_check, vidi linije 133-4.
+            """
+            if gpt_check == False:
+                if prvi == 1:
+                    uslov = 3
+                elif drugi == 2:
+                    uslov = 4
+            elif gpt_check == True:
+                if prvi == 1:
+                    uslov = 5
+                elif drugi == 2:
                     uslov = 6
             return uslov
             break
+    if uslov != 3 and uslov != 4 and uslov != 5 and uslov != 6:
+        return 0
 
 def prvi_uslov(reč, prefiks, rečnik):
     """
@@ -69,14 +81,15 @@ def drugi_uslov(prefiks, reč, lista_prefiksa, rečnik):
         return 0
 
 
-def prefiksator(reč, lista_prefiksa, rečnik, lista_sufiksa, lista_infinitiva, lista_glagola):
-    global uslov, prefiks, prefiks2, sufiks, potencijalni_glagol, reč_za_proveru
+def prefiksator(reč, lista_prefiksa, rečnik, lista_sufiksa, lista_infinitiva, lista_glagola, lj_lista):
+    global uslov, prefiks, prefiks2, sufiks, potencijalni_glagol
     """
     startswith_check je promenljiva koja prati da li ijedan prefiks (uz alomorfska pravila) odgovara početku reči; služi da bi se u uslov_0.txt našle samo reči poput 'sako' (sa-), ali ne i 'pšenica' (pš-???)
     """
     startswith_check = False
 
     for prefiks in lista_prefiksa:
+        gpt_check = False
         """
         uslov je promenljiva koja prati da li je zadovoljen neki od uslova da se slovni niz smatra prefiksom
         """
@@ -117,14 +130,20 @@ def prefiksator(reč, lista_prefiksa, rečnik, lista_sufiksa, lista_infinitiva, 
                     Za svaki od potencijalno prisutnih sufiksa proverava da li neki uslov može da se zadovolji
                     """
                     for sufiks in lista_sufiksa_za_pojedinačnu_reč:
-                        osnova_bez_sufiksa = reč[:(-len(sufiks))]
+                        """
+                        gpt_check je promenljiva koja odlučuje da li će funkcija provera_glagola proveravati za 3. i 4., ili za 5. i 6. pravilo
+                        gpt_check daje odgovor na pitanje "da li program trenutno proverava 5. i 6. pravilo?"
+                        """
+                        gpt_check = False
 
-                        uslov = provera_glagola(osnova_bez_sufiksa, lista_infinitiva, uslov, lista_glagola, lista_prefiksa)
+                        osnova_bez_sufiksa = reč[:(-len(sufiks))]
+                        uslov = provera_glagola(osnova_bez_sufiksa, lista_infinitiva, uslov, lista_glagola, lista_prefiksa, gpt_check)
                         
                         """
                         Ako nije zadovoljen ni treći ni četvrti uslov, prelazi se na peti i šesti:
                         """
                         if uslov == 0:
+                            gpt_check = True
 
                             """
                             Ako je u pitanju neki od sufiksa koji su se stopili sa nastavkom za građenje gpt, program ovde vraća to 'n' na osnovu.
@@ -132,43 +151,43 @@ def prefiksator(reč, lista_prefiksa, rečnik, lista_sufiksa, lista_infinitiva, 
                             if sufiks.startswith('n'):
                                 osnova_bez_sufiksa = osnova_bez_sufiksa + 'n'
 
-                            if osnova_bez_sufiksa.endswith('nut'):
+                            if osnova_bez_sufiksa.endswith('nut') or osnova_bez_sufiksa.endswith('at'):
                                 osnova_bez_sufiksa = osnova_bez_sufiksa[:-1]
-                                uslov = provera_glagola(osnova_bez_sufiksa, lista_infinitiva, uslov, lista_glagola, lista_prefiksa)
+                                uslov = provera_glagola(osnova_bez_sufiksa, lista_infinitiva, uslov, lista_glagola, lista_prefiksa, gpt_check)
 
                             elif osnova_bez_sufiksa.endswith('an'):
                                 osnova_bez_sufiksa = osnova_bez_sufiksa[:-1]
-                                uslov = provera_glagola(osnova_bez_sufiksa, lista_infinitiva, uslov, lista_glagola, lista_prefiksa)
+                                uslov = provera_glagola(osnova_bez_sufiksa, lista_infinitiva, uslov, lista_glagola, lista_prefiksa, gpt_check)
 
                             elif osnova_bez_sufiksa.endswith('en'):
                                 osnova_bez_sufiksa = osnova_bez_sufiksa[:-2]
-                                uslov = provera_glagola(osnova_bez_sufiksa, lista_infinitiva, uslov, lista_glagola, lista_prefiksa)
+                                uslov = provera_glagola(osnova_bez_sufiksa, lista_infinitiva, uslov, lista_glagola, lista_prefiksa, gpt_check)
                                 for jotovano in lj_lista:
                                     if osnova_bez_sufiksa.endswith(jotovano):
                                         osnova_bez_sufiksa = osnova_bez_sufiksa[:-2]
-                                        uslov = provera_glagola(osnova_bez_sufiksa, lista_infinitiva, uslov, lista_glagola, lista_prefiksa)
+                                        uslov = provera_glagola(osnova_bez_sufiksa, lista_infinitiva, uslov, lista_glagola, lista_prefiksa, gpt_check)
                                 if osnova_bez_sufiksa.endswith('đ'):
                                     osnova_bez_sufiksa = osnova_bez_sufiksa[:-1] + 'd'
-                                    uslov = provera_glagola(osnova_bez_sufiksa, lista_infinitiva, uslov, lista_glagola, lista_prefiksa)
+                                    uslov = provera_glagola(osnova_bez_sufiksa, lista_infinitiva, uslov, lista_glagola, lista_prefiksa, gpt_check)
                                 elif osnova_bez_sufiksa.endswith('ć'):
                                     osnova_bez_sufiksa = osnova_bez_sufiksa[:-1] + 't'
-                                    uslov = provera_glagola(osnova_bez_sufiksa, lista_infinitiva, uslov, lista_glagola, lista_prefiksa):
+                                    uslov = provera_glagola(osnova_bez_sufiksa, lista_infinitiva, uslov, lista_glagola, lista_prefiksa, gpt_check)
                                 elif osnova_bez_sufiksa.endswith('šlj'):
                                     osnova_bez_sufiksa = osnova_bez_sufiksa[:-3] + 'sl'
-                                    uslov = provera_glagola(osnova_bez_sufiksa, lista_infinitiva, uslov, lista_glagola, lista_prefiksa)
+                                    uslov = provera_glagola(osnova_bez_sufiksa, lista_infinitiva, uslov, lista_glagola, lista_prefiksa, gpt_check)
                                 elif osnova_bez_sufiksa.endswith('j'):
                                     osnova_bez_sufiksa = osnova_bez_sufiksa[:-1]
-                                    uslov = provera_glagola(osnova_bez_sufiksa, lista_infinitiva, uslov, lista_glagola, lista_prefiksa)
+                                    uslov = provera_glagola(osnova_bez_sufiksa, lista_infinitiva, uslov, lista_glagola, lista_prefiksa, gpt_check)
                                 elif osnova_bez_sufiksa.endswith('š'):
                                     osnova_bez_sufiksa = osnova_bez_sufiksa[:-1] + 's'
-                                    uslov = provera_glagola(osnova_bez_sufiksa, lista_infinitiva, uslov, lista_glagola, lista_prefiksa)
+                                    uslov = provera_glagola(osnova_bez_sufiksa, lista_infinitiva, uslov, lista_glagola, lista_prefiksa, gpt_check)
                                 elif osnova_bez_sufiksa.endswith('č'):
                                     osnova_bez_sufiksa = osnova_bez_sufiksa[:-1] + 'c'
-                                    uslov = provera_glagola(osnova_bez_sufiksa, lista_infinitiva, uslov, lista_glagola, lista_prefiksa)
+                                    uslov = provera_glagola(osnova_bez_sufiksa, lista_infinitiva, uslov, lista_glagola, lista_prefiksa, gpt_check)
                                 elif osnova_bez_sufiksa.endswith('č'):
                                     osnova_bez_sufiksa = osnova_bez_sufiksa[:-1]
                                     lista_infinitiva_ći = ['ći']
-                                    uslov = provera_glagola(osnova_bez_sufiksa, lista_infinitiva_ći, uslov, lista_glagola, lista_prefiksa)   
+                                    uslov = provera_glagola(osnova_bez_sufiksa, lista_infinitiva_ći, uslov, lista_glagola, lista_prefiksa, gpt_check)
 
                         """
                         Naredni if/elif upisuje ako je neki uslov zadovoljen i breakuje for za odabrani sufiks iz liste sufiksa, dakle prelazi na sledeću reč.
