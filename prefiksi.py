@@ -29,7 +29,7 @@ def alomorf(prefiks, reč):
 
 def provera_glagola(osnova_bez_sufiksa, lista_infinitiva, uslov, lista_glagola, lista_prefiksa, gpt_check):
     """
-    Proverava da li imenice koje su nastale od glagolskog prideva trpnog zadovoljavaju peti odnosno šesti uslov.
+    Proverava 3. i 4., odnosno 5. i 6. uslov.
     """
     for nastavak_za_infinitiv in lista_infinitiva:
         potencijalni_glagol = osnova_bez_sufiksa + nastavak_za_infinitiv
@@ -39,7 +39,7 @@ def provera_glagola(osnova_bez_sufiksa, lista_infinitiva, uslov, lista_glagola, 
                 drugi = drugi_uslov(prefiks, potencijalni_glagol, lista_prefiksa, lista_glagola)
 
             """
-            Za objašnjenje gpt_check, vidi linije 133-4.
+            Za objašnjenje gpt_check, vidi linije 134-5.
             """
             if gpt_check == False:
                 if prvi == 1:
@@ -69,11 +69,11 @@ def prvi_uslov(reč, prefiks, rečnik):
 def drugi_uslov(prefiks, reč, lista_prefiksa, rečnik):
     global prefiks2
     """
-    Proverava da li se na potencijalnu osnovu moze dodati drugi prefiks tako da dobijena reč bude leksikalizovana.         
+    Proverava da li se na potencijalnu osnovu može dodati drugi prefiks tako da dobijena reč bude leksikalizovana.         
     """
     uslov = 0
     for prefiks2 in lista_prefiksa:
-        if prefiks2 + reč[len(prefiks):] in rečnik and prefiks != prefiks2 and len(reč[len(prefiks):]) > 1 and len(reč[len(prefiks2):]) > 1 and alomorf(prefiks2, reč) == True: #treći uslov u if petlji: ne zelimo da se prefiks menja samim sobom.
+        if prefiks2 + reč[len(prefiks):] in rečnik and prefiks != prefiks2 and len(reč[len(prefiks):]) > 1 and len(reč[len(prefiks2):]) > 1 and alomorf(prefiks2, reč) == True:
             uslov = 2
             return uslov
             break
@@ -84,22 +84,22 @@ def drugi_uslov(prefiks, reč, lista_prefiksa, rečnik):
 def prefiksator(reč, lista_prefiksa, rečnik, lista_sufiksa, lista_infinitiva, lista_glagola, lj_lista):
     global uslov, prefiks, prefiks2, sufiks, potencijalni_glagol
     """
-    startswith_check je promenljiva koja prati da li ijedan prefiks (uz alomorfska pravila) odgovara početku reči; služi da bi se u uslov_0.txt našle samo reči poput 'sako' (sa-), ali ne i 'pšenica' (pš-???)
+    startswith_check je promenljiva koja prati da li ijedan prefiks (uz alomorfska pravila) odgovara početku reči; služi da bi se u uslov_0.txt našle samo reči poput 'sako' (sa-), ali ne i 'pšenica' (pš-???).
     """
     startswith_check = False
 
     for prefiks in lista_prefiksa:
         gpt_check = False
         """
-        uslov je promenljiva koja prati da li je zadovoljen neki od uslova da se slovni niz smatra prefiksom
+        uslov je promenljiva koja prati da li je zadovoljen neki od uslova da se slovni niz smatra prefiksom.
         """
-        uslov = 0 
+        uslov = 0
 
         if reč.startswith(prefiks) and alomorf(prefiks, reč) == True:
             startswith_check = True
             
             """
-            Provera prvog uslova
+            Provera prvog uslova.
             """
             uslov = prvi_uslov(reč, prefiks, rečnik)
             if uslov == 1:
@@ -109,7 +109,7 @@ def prefiksator(reč, lista_prefiksa, rečnik, lista_sufiksa, lista_infinitiva, 
 
             else:
                 """
-                Provera drugog uslova
+                Provera drugog uslova.
                 """
                 uslov = drugi_uslov(prefiks, reč, lista_prefiksa, rečnik)
                 if uslov == 2:
@@ -119,7 +119,7 @@ def prefiksator(reč, lista_prefiksa, rečnik, lista_sufiksa, lista_infinitiva, 
 
                 else:
                     """
-                    Proverava da li se reč završava na sufiks(e) (može da prepozna da se reč završava na više sufiksa, npr. -ijacija i -a)
+                    Proverava da li se reč završava na sufiks(e) (može da prepozna da se reč završava na više sufiksa, npr. '-ijacija' i '-a').
                     """
                     lista_sufiksa_za_pojedinačnu_reč = list() 
                     for sufiks in lista_sufiksa:
@@ -127,12 +127,12 @@ def prefiksator(reč, lista_prefiksa, rečnik, lista_sufiksa, lista_infinitiva, 
                             lista_sufiksa_za_pojedinačnu_reč.append(sufiks)
 
                     """
-                    Za svaki od potencijalno prisutnih sufiksa proverava da li neki uslov može da se zadovolji
+                    Za svaki od potencijalno prisutnih sufiksa proverava da li neki uslov može da se zadovolji.
                     """
                     for sufiks in lista_sufiksa_za_pojedinačnu_reč:
                         """
-                        gpt_check je promenljiva koja odlučuje da li će funkcija provera_glagola proveravati za 3. i 4., ili za 5. i 6. pravilo
-                        gpt_check daje odgovor na pitanje "da li program trenutno proverava 5. i 6. pravilo?"
+                        gpt_check je promenljiva koja daje odgovor na pitanje "da li program trenutno proverava 5. i 6. pravilo?".
+                        Potrebna je da bi funkcija provera_glagola znala da li da povrati 3 ili 5, odnosno 4 ili 6, budući da ti uslovi funkcionišu na istom principu.
                         """
                         gpt_check = False
 
@@ -208,9 +208,15 @@ def prefiksator(reč, lista_prefiksa, rečnik, lista_sufiksa, lista_infinitiva, 
                             with open('uslov_6.txt', 'a+', encoding = 'utf-8') as izlaz_6:
                                 izlaz_6.write(reč + ' : ' + prefiks + ' : ' + sufiks + '\n')  
                                 break
+                    """
+                    Ako je za neki sufiks uspeo da zadovolji neki uslov, breakuje for za prefikse.
+                    Bez ovog if-a, reči poput zaštita bi završavale i u uslov_3.txt (za prefiks 'za-'') i u uslov_0.txt (za prefiks 'z-').
+                    """
+                    if uslov != 0:
+                        break
     
     """
-    Ukoliko reč nije zadovoljila nijedan uslov (uslov == 0), a počinje slovnim nizom koji je jednak nekom od prefiksa (startswith_check == True), program je izbacuje u uslov_0.txt
+    Ukoliko reč nije zadovoljila nijedan uslov (uslov == 0), a počinje slovnim nizom koji je jednak nekom od prefiksa (startswith_check == True), program je izbacuje u uslov_0.txt.
     """
     if uslov == 0 and startswith_check == True:
         with open('uslov_0.txt', 'a+', encoding = 'utf-8') as izlaz_0:
