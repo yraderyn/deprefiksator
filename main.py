@@ -17,6 +17,7 @@ if __name__ == '__main__':
 		lista_infinitiva = ['karati', 'uckati', 'uljiti', 'ušiti', 'arati', 'avati', 'evati', 'ivati', 'ovati', 'isati', 'irati', 'ijati', 'nuti', 'kati', 'ati', 'iti', 'eti', 'ti']
 		lj_lista = ['blj', 'vlj', 'plj', 'mlj']
 		lista_fajlova = ['uslov_0.txt', 'uslov_1.txt', 'uslov_2.txt', 'uslov_3.txt', 'uslov_4.txt', 'uslov_5.txt', 'uslov_6.txt']
+		frekvencijski_rečnik = dict()
 
 
 		# leme glagola
@@ -27,16 +28,33 @@ if __name__ == '__main__':
 		with open('imenice.txt', 'r', encoding = 'utf-8') as korpus:
 			rečnik = [red[:-1] for red in korpus.readlines()]
 
-
 		for reč in rečnik:
 			prefiksator(reč, lista_prefiksa, rečnik, lista_sufiksa, lista_infinitiva, lista_glagola, lj_lista)
 
 		with open('lista_svih.txt', 'a+') as izlaz:
-			for fajl in lista_fajlova:
-				with open(fajl) as ulaz:
-					for red in ulaz:
-						red = re.sub(' .*', '', red)
-						izlaz.write(red)
+			with open('uslov.txt', 'a+') as uslov:
+				with open('frekvencijski_rečnik.txt', 'a+') as frekvencijski_rečnik_izlaz:
+
+					for fajl in lista_fajlova:
+						with open(fajl) as ulaz:
+							for red in ulaz:
+								if fajl != 'uslov_0.txt':
+									uslov.write(red)
+								red = re.sub(' .*', '', red)
+								izlaz.write(red)
+
+					reči = [red for red in uslov]
+					for red in reči:
+						nađeni_prefiks = re.findall('\[.*\]', red)[0].strip('[]')
+						try:
+							frekvencijski_rečnik[nađeni_prefiks] += 1
+						except:
+							frekvencijski_rečnik[nađeni_prefiks] = 1
+					frekvencijski_rečnik = sorted(frekvencijski_rečnik.items(), key=lambda kv: kv[1])
+
+					for nađeni_prefiks in frekvencijski_rečnik:
+						nađeni_prefiks = re.sub('[()\',]', '', str(nađeni_prefiks))
+						frekvencijski_rečnik_izlaz.write(nađeni_prefiks + '\n')
 
 	else:
 		"Došlo je do greške, pokrenite program ponovo."

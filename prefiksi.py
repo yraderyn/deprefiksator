@@ -104,7 +104,7 @@ def prefiksator(reč, lista_prefiksa, rečnik, lista_sufiksa, lista_infinitiva, 
             uslov = prvi_uslov(reč, prefiks, rečnik)
             if uslov == 1:
                 with open('uslov_1.txt', 'a+', encoding = 'utf-8') as izlaz_1:
-                    izlaz_1.write(reč + ' : ' + prefiks + '\n')
+                    izlaz_1.write(reč + ' {1} [' + prefiks + ']\n')
                     break
 
             else:
@@ -114,7 +114,7 @@ def prefiksator(reč, lista_prefiksa, rečnik, lista_sufiksa, lista_infinitiva, 
                 uslov = drugi_uslov(prefiks, reč, lista_prefiksa, rečnik)
                 if uslov == 2:
                     with open('uslov_2.txt', 'a+', encoding = 'utf-8') as izlaz_2:
-                        izlaz_2.write(reč + ' : ' + prefiks + ' (' + prefiks2 + ')\n')
+                        izlaz_2.write(reč + ' {2} (' + prefiks2 + '-) [' + prefiks + ']\n')
                         break
 
                 else:
@@ -194,19 +194,19 @@ def prefiksator(reč, lista_prefiksa, rečnik, lista_sufiksa, lista_infinitiva, 
                         """
                         if uslov == 3:
                             with open('uslov_3.txt', 'a+', encoding = 'utf-8') as izlaz_3:
-                                izlaz_3.write(reč + ' : ' + prefiks + ' : ' + sufiks + '\n')
+                                izlaz_3.write(reč + ' {3} (-' + sufiks + ') [' + prefiks + ']\n')
                                 break
                         elif uslov == 4:
                             with open('uslov_4.txt', 'a+', encoding = 'utf-8') as izlaz_4:
-                                izlaz_4.write(reč + ' : ' + prefiks + ' : ' + sufiks + '\n')
+                                izlaz_4.write(reč + ' {4} (-' + sufiks + ') [' + prefiks + ']\n')
                                 break
                         elif uslov == 5:
                             with open('uslov_5.txt', 'a+', encoding = 'utf-8') as izlaz_5:
-                                izlaz_5.write(reč + ' : ' + prefiks + ' : ' + sufiks + '\n')
+                                izlaz_5.write(reč + ' {5} (-' + sufiks + ') [' + prefiks + ']\n')
                                 break
                         elif uslov == 6:
                             with open('uslov_6.txt', 'a+', encoding = 'utf-8') as izlaz_6:
-                                izlaz_6.write(reč + ' : ' + prefiks + ' : ' + sufiks + '\n')  
+                                izlaz_6.write(reč + ' {6} (-' + sufiks + ') [' + prefiks + ']\n')
                                 break
                     """
                     Ako je za neki sufiks uspeo da zadovolji neki uslov, breakuje for za prefikse.
